@@ -10,18 +10,18 @@ interface BetFormProps {
 const BetForm: React.FC<BetFormProps> = ({ onBetCreated }) => {
   const { control, handleSubmit, reset, formState: { isSubmitting } } = useForm();
 
-  const onSubmit = async (data: { description: string; creator: string }) => {
+  const onSubmit = async (data: { description: string }) => {
     try {
-      const result = await backend.createBet(data.description, data.creator);
+      const result = await backend.proposeBet(data.description);
       if ('ok' in result) {
-        console.log('Bet created with ID:', result.ok);
+        console.log('Bet proposed with ID:', result.ok);
         reset();
         onBetCreated();
       } else {
-        console.error('Error creating bet:', result.err);
+        console.error('Error proposing bet:', result.err);
       }
     } catch (error) {
-      console.error('Error creating bet:', error);
+      console.error('Error proposing bet:', error);
     }
   };
 
@@ -44,22 +44,6 @@ const BetForm: React.FC<BetFormProps> = ({ onBetCreated }) => {
             />
           )}
         />
-        <Controller
-          name="creator"
-          control={control}
-          defaultValue=""
-          rules={{ required: 'Creator name is required' }}
-          render={({ field, fieldState: { error } }) => (
-            <TextField
-              {...field}
-              label="Your Name"
-              variant="outlined"
-              fullWidth
-              error={!!error}
-              helperText={error?.message}
-            />
-          )}
-        />
         <Button
           type="submit"
           variant="contained"
@@ -67,7 +51,7 @@ const BetForm: React.FC<BetFormProps> = ({ onBetCreated }) => {
           disabled={isSubmitting}
           startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
         >
-          Create Bet
+          Propose Bet
         </Button>
       </Box>
     </form>

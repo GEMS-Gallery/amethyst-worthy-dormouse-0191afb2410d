@@ -7,48 +7,88 @@ import Time "mo:base/Time";
 import Result "mo:base/Result";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
+import Principal "mo:base/Principal";
 
 actor {
-  // Define the Bet type
-  type Bet = {
-    id: Text;
-    description: Text;
-    creator: Text;
-    outcome: ?Text;
-    createdAt: Int;
+  type BetId = Text;
+  type UserId = Principal;
+
+  type BetStatus = {
+    #Proposed;
+    #Accepted;
+    #Completed;
+    #Cancelled;
   };
 
-  // Stable variable to store bets
-  stable var betsEntries : [(Text, Bet)] = [];
+  type Bet = {
+    id: BetId;
+    description: Text;
+    creator: UserId;
+    counterparty: ?UserId;
+    outcome: ?Text;
+    createdAt: Int;
+    status: BetStatus;
+    smartContractAddress: ?Text;
+  };
 
-  // Create a HashMap to store bets
-  let bets = HashMap.fromIter<Text, Bet>(betsEntries.vals(), 0, Text.equal, Text.hash);
+  stable var betsEntries : [(BetId, Bet)] = [];
+  let bets = HashMap.fromIter<BetId, Bet>(betsEntries.vals(), 0, Text.equal, Text.hash);
 
-  // Create a new bet
-  public func createBet(description: Text, creator: Text) : async Result.Result<Text, Text> {
-    let id = Text.concat(creator, Int.toText(Time.now()));
+  public shared(msg) func proposeBet(description: Text) : async Result.Result<BetId, Text> {
+    let id = Text.concat(Principal.toText(msg.caller), Int.toText(Time.now()));
     let newBet : Bet = {
       id = id;
       description = description;
-      creator = creator;
+      creator = msg.caller;
+      counterparty = null;
       outcome = null;
       createdAt = Time.now();
+      status = #Proposed;
+      smartContractAddress = null;
     };
     bets.put(id, newBet);
     #ok(id)
   };
 
-  // Get all bets
-  public query func getBets() : async [Bet] {
-    Iter.toArray(bets.vals())
+  public shared(msg) func acceptBet(betId: BetId) : async Result.Result<Text, Text> {
+    switch (bets.get(betId)) {
+      case (null) { #err("Bet not found") };
+      case (?bet) {
+        if (bet.status != #Proposed) {
+          #err("Bet is not in a proposable state")
+        } else if (bet.creator == msg.caller) {
+          #err("Cannot accept your own bet")
+        } else {
+          let updatedBet : Bet = {
+            id = bet.id;
+            description = bet.description;
+            creator = bet.creator;
+            counterparty = ?msg.caller;
+            outcome = bet.outcome;
+            createdAt = bet.createdAt;
+            status = #Accepted;
+            smartContractAddress = ?createSmartContract(bet.id);
+          };
+          bets.put(betId, updatedBet);
+          #ok("Bet accepted and smart contract created")
+        }
+      };
+    }
   };
 
-  // Get a specific bet by ID
-  public query func getBet(id: Text) : async ?Bet {
+  public query func getBet(id: BetId) : async ?Bet {
     bets.get(id)
   };
 
-  // System functions for upgrades
+  public query func getAllBets() : async [Bet] {
+    Iter.toArray(bets.vals())
+  };
+
+  private func createSmartContract(betId: BetId) : Text {
+    // This is a placeholder. In a real implementation, this would interact with the IC to create an actual smart contract.
+    "ic://" # betId
+  };
+
   system func preupgrade() {
     betsEntries := Iter.toArray(bets.entries());
   };

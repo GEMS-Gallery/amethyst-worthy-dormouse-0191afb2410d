@@ -8,8 +8,11 @@ interface Bet {
   id: string;
   description: string;
   creator: string;
+  counterparty: string | null;
   outcome: string | null;
   createdAt: bigint;
+  status: 'Proposed' | 'Accepted' | 'Completed' | 'Cancelled';
+  smartContractAddress: string | null;
 }
 
 const App: React.FC = () => {
@@ -22,7 +25,7 @@ const App: React.FC = () => {
 
   const fetchBets = async () => {
     try {
-      const fetchedBets = await backend.getBets();
+      const fetchedBets = await backend.getAllBets();
       setBets(fetchedBets);
       setLoading(false);
     } catch (error) {
@@ -49,7 +52,7 @@ const App: React.FC = () => {
           {loading ? (
             <CircularProgress />
           ) : (
-            <BetList bets={bets} />
+            <BetList bets={bets} onBetAccepted={fetchBets} />
           )}
         </Box>
       </Box>

@@ -1,18 +1,36 @@
-type Result = 
+type UserId = principal;
+type Result_1 = 
  variant {
    err: text;
    ok: text;
  };
+type Result = 
+ variant {
+   err: text;
+   ok: BetId;
+ };
+type BetStatus = 
+ variant {
+   Accepted;
+   Cancelled;
+   Completed;
+   Proposed;
+ };
+type BetId = text;
 type Bet = 
  record {
+   counterparty: opt UserId;
    createdAt: int;
-   creator: text;
+   creator: UserId;
    description: text;
-   id: text;
+   id: BetId;
    outcome: opt text;
+   smartContractAddress: opt text;
+   status: BetStatus;
  };
 service : {
-  createBet: (text, text) -> (Result);
-  getBet: (text) -> (opt Bet) query;
-  getBets: () -> (vec Bet) query;
+  acceptBet: (BetId) -> (Result_1);
+  getAllBets: () -> (vec Bet) query;
+  getBet: (BetId) -> (opt Bet) query;
+  proposeBet: (text) -> (Result);
 }
