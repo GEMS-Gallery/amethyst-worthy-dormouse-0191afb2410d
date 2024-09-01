@@ -9,7 +9,9 @@ interface Bet {
   description: string;
   creator: string;
   counterparty: string | null;
-  outcome: string | null;
+  creatorProposedOutcome: string | null;
+  counterpartyProposedOutcome: string | null;
+  finalOutcome: string | null;
   createdAt: bigint;
   status: string;
   smartContractAddress: string | null;
@@ -60,7 +62,7 @@ const App: React.FC = () => {
           {loading ? (
             <CircularProgress />
           ) : (
-            <BetList bets={bets} onBetAccepted={fetchBets} />
+            <BetList bets={bets} onBetUpdated={fetchBets} />
           )}
         </Box>
       </Box>

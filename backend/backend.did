@@ -2,28 +2,32 @@ type UserId = text;
 type Result_1 = 
  variant {
    err: text;
-   ok: text;
+   ok: BetId;
  };
 type Result = 
  variant {
    err: text;
-   ok: BetId;
+   ok: text;
  };
 type BetId = text;
 type Bet = 
  record {
    counterparty: opt UserId;
+   counterpartyProposedOutcome: opt text;
    createdAt: int;
    creator: UserId;
+   creatorProposedOutcome: opt text;
    description: text;
+   finalOutcome: opt text;
    id: BetId;
-   outcome: opt text;
    smartContractAddress: opt text;
    status: text;
  };
 service : {
-  acceptBet: (BetId) -> (Result_1);
+  acceptBet: (BetId) -> (Result);
+  agreeOnOutcome: (BetId) -> (Result);
   getAllBets: () -> (vec Bet) query;
   getBet: (BetId) -> (opt Bet) query;
-  proposeBet: (text) -> (Result);
+  proposeBet: (text) -> (Result_1);
+  proposeOutcome: (BetId, text) -> (Result);
 }

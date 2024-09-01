@@ -16,6 +16,7 @@ actor {
   type BetStatus = {
     #Proposed;
     #Accepted;
+    #OutcomeProposed;
     #Completed;
     #Cancelled;
   };
@@ -25,7 +26,9 @@ actor {
     description: Text;
     creator: UserId;
     counterparty: ?UserId;
-    outcome: ?Text;
+    creatorProposedOutcome: ?Text;
+    counterpartyProposedOutcome: ?Text;
+    finalOutcome: ?Text;
     createdAt: Int;
     status: Text;
     smartContractAddress: ?Text;
@@ -41,7 +44,9 @@ actor {
       description = description;
       creator = Principal.toText(msg.caller);
       counterparty = null;
-      outcome = null;
+      creatorProposedOutcome = null;
+      counterpartyProposedOutcome = null;
+      finalOutcome = null;
       createdAt = Time.now();
       status = "Proposed";
       smartContractAddress = null;
@@ -64,13 +69,77 @@ actor {
             description = bet.description;
             creator = bet.creator;
             counterparty = ?Principal.toText(msg.caller);
-            outcome = bet.outcome;
+            creatorProposedOutcome = bet.creatorProposedOutcome;
+            counterpartyProposedOutcome = bet.counterpartyProposedOutcome;
+            finalOutcome = bet.finalOutcome;
             createdAt = bet.createdAt;
             status = "Accepted";
             smartContractAddress = ?createSmartContract(bet.id);
           };
           bets.put(betId, updatedBet);
           #ok("Bet accepted and smart contract created")
+        }
+      };
+    }
+  };
+
+  public shared(msg) func proposeOutcome(betId: BetId, outcome: Text) : async Result.Result<Text, Text> {
+    switch (bets.get(betId)) {
+      case (null) { #err("Bet not found") };
+      case (?bet) {
+        if (bet.status != "Accepted" and bet.status != "OutcomeProposed") {
+          #err("Bet is not in a state where outcomes can be proposed")
+        } else {
+          let isCreator = bet.creator == Principal.toText(msg.caller);
+          let isCounterparty = bet.counterparty == ?Principal.toText(msg.caller);
+          if (not isCreator and not isCounterparty) {
+            #err("Only bet participants can propose outcomes")
+          } else {
+            let updatedBet : Bet = {
+              id = bet.id;
+              description = bet.description;
+              creator = bet.creator;
+              counterparty = bet.counterparty;
+              creatorProposedOutcome = if (isCreator) ?outcome else bet.creatorProposedOutcome;
+              counterpartyProposedOutcome = if (isCounterparty) ?outcome else bet.counterpartyProposedOutcome;
+              finalOutcome = bet.finalOutcome;
+              createdAt = bet.createdAt;
+              status = "OutcomeProposed";
+              smartContractAddress = bet.smartContractAddress;
+            };
+            bets.put(betId, updatedBet);
+            #ok("Outcome proposed")
+          }
+        }
+      };
+    }
+  };
+
+  public shared(msg) func agreeOnOutcome(betId: BetId) : async Result.Result<Text, Text> {
+    switch (bets.get(betId)) {
+      case (null) { #err("Bet not found") };
+      case (?bet) {
+        if (bet.status != "OutcomeProposed") {
+          #err("Bet is not in a state where outcomes can be agreed upon")
+        } else if (bet.creatorProposedOutcome == null or bet.counterpartyProposedOutcome == null) {
+          #err("Both parties must propose an outcome before agreeing")
+        } else if (bet.creatorProposedOutcome != bet.counterpartyProposedOutcome) {
+          #err("Proposed outcomes do not match")
+        } else {
+          let updatedBet : Bet = {
+            id = bet.id;
+            description = bet.description;
+            creator = bet.creator;
+            counterparty = bet.counterparty;
+            creatorProposedOutcome = bet.creatorProposedOutcome;
+            counterpartyProposedOutcome = bet.counterpartyProposedOutcome;
+            finalOutcome = bet.creatorProposedOutcome;
+            createdAt = bet.createdAt;
+            status = "Completed";
+            smartContractAddress = bet.smartContractAddress;
+          };
+          bets.put(betId, updatedBet);
+          #ok("Outcome agreed and bet completed")
         }
       };
     }
