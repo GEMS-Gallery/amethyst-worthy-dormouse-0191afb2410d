@@ -12,9 +12,11 @@ export interface Bet {
   'finalOutcome' : [] | [string],
   'creatorProposedOutcome' : [] | [string],
   'counterparty' : [] | [UserId],
+  'category' : Category,
   'counterpartyProposedOutcome' : [] | [string],
 }
 export type BetId = string;
+export type Category = string;
 export type Result = { 'ok' : string } |
   { 'err' : string };
 export type Result_1 = { 'ok' : BetId } |
@@ -25,7 +27,7 @@ export interface _SERVICE {
   'agreeOnOutcome' : ActorMethod<[BetId], Result>,
   'getAllBets' : ActorMethod<[], Array<Bet>>,
   'getBet' : ActorMethod<[BetId], [] | [Bet]>,
-  'proposeBet' : ActorMethod<[string], Result_1>,
+  'proposeBet' : ActorMethod<[string, Category], Result_1>,
   'proposeOutcome' : ActorMethod<[BetId, string], Result>,
 }
 export declare const idlFactory: IDL.InterfaceFactory;

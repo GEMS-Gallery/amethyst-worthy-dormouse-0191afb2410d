@@ -12,6 +12,7 @@ import Principal "mo:base/Principal";
 actor {
   type BetId = Text;
   type UserId = Text;
+  type Category = Text;
 
   type BetStatus = {
     #Proposed;
@@ -32,12 +33,13 @@ actor {
     createdAt: Int;
     status: Text;
     smartContractAddress: ?Text;
+    category: Category;
   };
 
   stable var betsEntries : [(BetId, Bet)] = [];
   let bets = HashMap.fromIter<BetId, Bet>(betsEntries.vals(), 0, Text.equal, Text.hash);
 
-  public shared(msg) func proposeBet(description: Text) : async Result.Result<BetId, Text> {
+  public shared(msg) func proposeBet(description: Text, category: Category) : async Result.Result<BetId, Text> {
     let id = Text.concat(Principal.toText(msg.caller), Int.toText(Time.now()));
     let newBet : Bet = {
       id = id;
@@ -50,6 +52,7 @@ actor {
       createdAt = Time.now();
       status = "Proposed";
       smartContractAddress = null;
+      category = category;
     };
     bets.put(id, newBet);
     #ok(id)
@@ -75,6 +78,7 @@ actor {
             createdAt = bet.createdAt;
             status = "Accepted";
             smartContractAddress = ?createSmartContract(bet.id);
+            category = bet.category;
           };
           bets.put(betId, updatedBet);
           #ok("Bet accepted and smart contract created")
@@ -106,6 +110,7 @@ actor {
               createdAt = bet.createdAt;
               status = "OutcomeProposed";
               smartContractAddress = bet.smartContractAddress;
+              category = bet.category;
             };
             bets.put(betId, updatedBet);
             #ok("Outcome proposed")
@@ -137,6 +142,7 @@ actor {
             createdAt = bet.createdAt;
             status = "Completed";
             smartContractAddress = bet.smartContractAddress;
+            category = bet.category;
           };
           bets.put(betId, updatedBet);
           #ok("Outcome agreed and bet completed")

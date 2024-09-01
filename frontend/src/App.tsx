@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, CircularProgress, AppBar, Toolbar } from '@mui/material';
+import { Container, Typography, Box, CircularProgress, AppBar, Toolbar, Grid } from '@mui/material';
 import { backend } from 'declarations/backend';
 import BetList from './components/BetList';
 import BetForm from './components/BetForm';
+import Sidebar from './components/Sidebar';
 
 interface Bet {
   id: string;
@@ -15,11 +16,13 @@ interface Bet {
   createdAt: bigint;
   status: string;
   smartContractAddress: string | null;
+  category: string;
 }
 
 const App: React.FC = () => {
   const [bets, setBets] = useState<Bet[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
     fetchBets();
@@ -48,6 +51,10 @@ const App: React.FC = () => {
     fetchBets();
   };
 
+  const filteredBets = selectedCategory
+    ? bets.filter((bet) => bet.category === selectedCategory)
+    : bets;
+
   return (
     <>
       <AppBar position="static" className="gradient-bg">
@@ -57,20 +64,27 @@ const App: React.FC = () => {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Container maxWidth="md">
-        <Box mt={4}>
-          <BetForm onBetCreated={handleBetCreated} />
-          <Box my={4}>
-            <Typography variant="h4" component="h2" gutterBottom>
-              Existing Bets
-            </Typography>
-            {loading ? (
-              <CircularProgress />
-            ) : (
-              <BetList bets={bets} onBetUpdated={fetchBets} />
-            )}
-          </Box>
-        </Box>
+      <Container maxWidth="lg">
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={3}>
+            <Sidebar onCategorySelect={setSelectedCategory} />
+          </Grid>
+          <Grid item xs={12} md={9}>
+            <Box mt={4}>
+              <BetForm onBetCreated={handleBetCreated} />
+              <Box my={4}>
+                <Typography variant="h4" component="h2" gutterBottom>
+                  {selectedCategory ? `${selectedCategory} Bets` : 'All Bets'}
+                </Typography>
+                {loading ? (
+                  <CircularProgress />
+                ) : (
+                  <BetList bets={filteredBets} onBetUpdated={fetchBets} />
+                )}
+              </Box>
+            </Box>
+          </Grid>
+        </Grid>
       </Container>
     </>
   );

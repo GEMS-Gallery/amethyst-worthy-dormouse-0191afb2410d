@@ -13,6 +13,7 @@ interface Bet {
   createdAt: bigint;
   status: string;
   smartContractAddress: string | null;
+  category: string;
 }
 
 interface BetListProps {
@@ -87,6 +88,7 @@ const BetList: React.FC<BetListProps> = ({ bets, onBetUpdated }) => {
               </Typography>
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                 <Chip label={bet.status} color="primary" variant="outlined" />
+                <Chip label={bet.category} color="secondary" variant="outlined" />
                 <Typography variant="body2" color="text.secondary">
                   Created: {new Date(Number(bet.createdAt) / 1000000).toLocaleString()}
                 </Typography>

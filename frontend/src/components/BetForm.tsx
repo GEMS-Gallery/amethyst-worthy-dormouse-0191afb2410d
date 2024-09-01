@@ -1,6 +1,6 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { TextField, Button, Box, CircularProgress, Card, CardContent, Typography } from '@mui/material';
+import { TextField, Button, Box, CircularProgress, Card, CardContent, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { backend } from 'declarations/backend';
 
 interface BetFormProps {
@@ -10,9 +10,9 @@ interface BetFormProps {
 const BetForm: React.FC<BetFormProps> = ({ onBetCreated }) => {
   const { control, handleSubmit, reset, formState: { isSubmitting } } = useForm();
 
-  const onSubmit = async (data: { description: string }) => {
+  const onSubmit = async (data: { description: string; category: string }) => {
     try {
-      const result = await backend.proposeBet(data.description);
+      const result = await backend.proposeBet(data.description, data.category);
       if ('ok' in result) {
         console.log('Bet proposed with ID:', result.ok);
         reset();
@@ -47,6 +47,29 @@ const BetForm: React.FC<BetFormProps> = ({ onBetCreated }) => {
                   error={!!error}
                   helperText={error?.message}
                 />
+              )}
+            />
+            <Controller
+              name="category"
+              control={control}
+              defaultValue=""
+              rules={{ required: 'Category is required' }}
+              render={({ field, fieldState: { error } }) => (
+                <FormControl fullWidth error={!!error}>
+                  <InputLabel id="category-label">Category</InputLabel>
+                  <Select
+                    {...field}
+                    labelId="category-label"
+                    label="Category"
+                  >
+                    <MenuItem value="sports">Sports</MenuItem>
+                    <MenuItem value="politics">Politics</MenuItem>
+                    <MenuItem value="entertainment">Entertainment</MenuItem>
+                    <MenuItem value="technology">Technology</MenuItem>
+                    <MenuItem value="other">Other</MenuItem>
+                  </Select>
+                  {error && <Typography color="error">{error.message}</Typography>}
+                </FormControl>
               )}
             />
             <Button

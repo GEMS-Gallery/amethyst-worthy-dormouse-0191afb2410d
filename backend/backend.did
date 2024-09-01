@@ -9,9 +9,11 @@ type Result =
    err: text;
    ok: text;
  };
+type Category = text;
 type BetId = text;
 type Bet = 
  record {
+   category: Category;
    counterparty: opt UserId;
    counterpartyProposedOutcome: opt text;
    createdAt: int;
@@ -28,6 +30,6 @@ service : {
   agreeOnOutcome: (BetId) -> (Result);
   getAllBets: () -> (vec Bet) query;
   getBet: (BetId) -> (opt Bet) query;
-  proposeBet: (text) -> (Result_1);
+  proposeBet: (text, Category) -> (Result_1);
   proposeOutcome: (BetId, text) -> (Result);
 }
