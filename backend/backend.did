@@ -1,0 +1,18 @@
+type Result = 
+ variant {
+   err: text;
+   ok: text;
+ };
+type Bet = 
+ record {
+   createdAt: int;
+   creator: text;
+   description: text;
+   id: text;
+   outcome: opt text;
+ };
+service : {
+  createBet: (text, text) -> (Result);
+  getBet: (text) -> (opt Bet) query;
+  getBets: () -> (vec Bet) query;
+}
