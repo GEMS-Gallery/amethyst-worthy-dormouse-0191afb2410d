@@ -5,7 +5,7 @@ import type { IDL } from '@dfinity/candid';
 export interface Bet {
   'id' : BetId,
   'smartContractAddress' : [] | [string],
-  'status' : BetStatus,
+  'status' : string,
   'creator' : UserId,
   'createdAt' : bigint,
   'description' : string,
@@ -13,15 +13,11 @@ export interface Bet {
   'outcome' : [] | [string],
 }
 export type BetId = string;
-export type BetStatus = { 'Proposed' : null } |
-  { 'Accepted' : null } |
-  { 'Cancelled' : null } |
-  { 'Completed' : null };
 export type Result = { 'ok' : BetId } |
   { 'err' : string };
 export type Result_1 = { 'ok' : string } |
   { 'err' : string };
-export type UserId = Principal;
+export type UserId = string;
 export interface _SERVICE {
   'acceptBet' : ActorMethod<[BetId], Result_1>,
   'getAllBets' : ActorMethod<[], Array<Bet>>,

@@ -1,17 +1,11 @@
 export const idlFactory = ({ IDL }) => {
   const BetId = IDL.Text;
   const Result_1 = IDL.Variant({ 'ok' : IDL.Text, 'err' : IDL.Text });
-  const BetStatus = IDL.Variant({
-    'Proposed' : IDL.Null,
-    'Accepted' : IDL.Null,
-    'Cancelled' : IDL.Null,
-    'Completed' : IDL.Null,
-  });
-  const UserId = IDL.Principal;
+  const UserId = IDL.Text;
   const Bet = IDL.Record({
     'id' : BetId,
     'smartContractAddress' : IDL.Opt(IDL.Text),
-    'status' : BetStatus,
+    'status' : IDL.Text,
     'creator' : UserId,
     'createdAt' : IDL.Int,
     'description' : IDL.Text,

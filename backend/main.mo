@@ -11,7 +11,7 @@ import Principal "mo:base/Principal";
 
 actor {
   type BetId = Text;
-  type UserId = Principal;
+  type UserId = Text;
 
   type BetStatus = {
     #Proposed;
@@ -27,7 +27,7 @@ actor {
     counterparty: ?UserId;
     outcome: ?Text;
     createdAt: Int;
-    status: BetStatus;
+    status: Text;
     smartContractAddress: ?Text;
   };
 
@@ -39,11 +39,11 @@ actor {
     let newBet : Bet = {
       id = id;
       description = description;
-      creator = msg.caller;
+      creator = Principal.toText(msg.caller);
       counterparty = null;
       outcome = null;
       createdAt = Time.now();
-      status = #Proposed;
+      status = "Proposed";
       smartContractAddress = null;
     };
     bets.put(id, newBet);
@@ -54,19 +54,19 @@ actor {
     switch (bets.get(betId)) {
       case (null) { #err("Bet not found") };
       case (?bet) {
-        if (bet.status != #Proposed) {
+        if (bet.status != "Proposed") {
           #err("Bet is not in a proposable state")
-        } else if (bet.creator == msg.caller) {
+        } else if (bet.creator == Principal.toText(msg.caller)) {
           #err("Cannot accept your own bet")
         } else {
           let updatedBet : Bet = {
             id = bet.id;
             description = bet.description;
             creator = bet.creator;
-            counterparty = ?msg.caller;
+            counterparty = ?Principal.toText(msg.caller);
             outcome = bet.outcome;
             createdAt = bet.createdAt;
-            status = #Accepted;
+            status = "Accepted";
             smartContractAddress = ?createSmartContract(bet.id);
           };
           bets.put(betId, updatedBet);

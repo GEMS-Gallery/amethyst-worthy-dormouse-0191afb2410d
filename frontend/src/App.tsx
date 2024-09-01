@@ -11,7 +11,7 @@ interface Bet {
   counterparty: string | null;
   outcome: string | null;
   createdAt: bigint;
-  status: 'Proposed' | 'Accepted' | 'Completed' | 'Cancelled';
+  status: string;
   smartContractAddress: string | null;
 }
 
@@ -26,13 +26,21 @@ const App: React.FC = () => {
   const fetchBets = async () => {
     try {
       const fetchedBets = await backend.getAllBets();
-      setBets(fetchedBets);
+      setBets(fetchedBets.map(convertBet));
       setLoading(false);
     } catch (error) {
       console.error('Error fetching bets:', error);
       setLoading(false);
     }
   };
+
+  const convertBet = (bet: any): Bet => ({
+    ...bet,
+    creator: bet.creator.toString(),
+    counterparty: bet.counterparty ? bet.counterparty.toString() : null,
+    createdAt: BigInt(bet.createdAt),
+    status: bet.status.toString(),
+  });
 
   const handleBetCreated = () => {
     fetchBets();

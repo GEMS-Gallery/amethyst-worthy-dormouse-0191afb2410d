@@ -1,4 +1,4 @@
-type UserId = principal;
+type UserId = text;
 type Result_1 = 
  variant {
    err: text;
@@ -8,13 +8,6 @@ type Result =
  variant {
    err: text;
    ok: BetId;
- };
-type BetStatus = 
- variant {
-   Accepted;
-   Cancelled;
-   Completed;
-   Proposed;
  };
 type BetId = text;
 type Bet = 
@@ -26,7 +19,7 @@ type Bet =
    id: BetId;
    outcome: opt text;
    smartContractAddress: opt text;
-   status: BetStatus;
+   status: text;
  };
 service : {
   acceptBet: (BetId) -> (Result_1);

@@ -9,7 +9,7 @@ interface Bet {
   counterparty: string | null;
   outcome: string | null;
   createdAt: bigint;
-  status: 'Proposed' | 'Accepted' | 'Completed' | 'Cancelled';
+  status: string;
   smartContractAddress: string | null;
 }
 
