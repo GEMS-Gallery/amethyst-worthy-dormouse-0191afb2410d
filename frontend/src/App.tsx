@@ -37,24 +37,21 @@ const App: React.FC = () => {
 
   return (
     <Container maxWidth="md">
-      <img
-        src="https://images.unsplash.com/photo-1586020969217-9b2296b53ffe?ixid=M3w2MzIxNTd8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MjUyMjk2MzB8&ixlib=rb-4.0.3"
-        alt="Future prediction"
-        className="header-image"
-      />
-      <Typography variant="h2" component="h1" gutterBottom>
-        Future Bet Creator
-      </Typography>
-      <BetForm onBetCreated={handleBetCreated} />
-      <Box my={4}>
-        <Typography variant="h4" component="h2" gutterBottom>
-          Existing Bets
+      <Box mt={4}>
+        <Typography variant="h2" component="h1" gutterBottom>
+          Future Bet Creator
         </Typography>
-        {loading ? (
-          <CircularProgress />
-        ) : (
-          <BetList bets={bets} />
-        )}
+        <BetForm onBetCreated={handleBetCreated} />
+        <Box my={4}>
+          <Typography variant="h4" component="h2" gutterBottom>
+            Existing Bets
+          </Typography>
+          {loading ? (
+            <CircularProgress />
+          ) : (
+            <BetList bets={bets} />
+          )}
+        </Box>
       </Box>
     </Container>
   );
