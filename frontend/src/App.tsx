@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, CircularProgress } from '@mui/material';
+import { Container, Typography, Box, CircularProgress, AppBar, Toolbar } from '@mui/material';
 import { backend } from 'declarations/backend';
 import BetList from './components/BetList';
 import BetForm from './components/BetForm';
@@ -49,24 +49,30 @@ const App: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="md">
-      <Box mt={4}>
-        <Typography variant="h2" component="h1" gutterBottom>
-          Future Bet Creator
-        </Typography>
-        <BetForm onBetCreated={handleBetCreated} />
-        <Box my={4}>
-          <Typography variant="h4" component="h2" gutterBottom>
-            Existing Bets
+    <>
+      <AppBar position="static" className="gradient-bg">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Future Bet Creator
           </Typography>
-          {loading ? (
-            <CircularProgress />
-          ) : (
-            <BetList bets={bets} onBetUpdated={fetchBets} />
-          )}
+        </Toolbar>
+      </AppBar>
+      <Container maxWidth="md">
+        <Box mt={4}>
+          <BetForm onBetCreated={handleBetCreated} />
+          <Box my={4}>
+            <Typography variant="h4" component="h2" gutterBottom>
+              Existing Bets
+            </Typography>
+            {loading ? (
+              <CircularProgress />
+            ) : (
+              <BetList bets={bets} onBetUpdated={fetchBets} />
+            )}
+          </Box>
         </Box>
-      </Box>
-    </Container>
+      </Container>
+    </>
   );
 };
 

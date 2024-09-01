@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { List, ListItem, ListItemText, Paper, Typography, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { List, ListItem, Card, CardContent, Typography, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Chip, Box } from '@mui/material';
 import { backend } from 'declarations/backend';
 
 interface Bet {
@@ -77,75 +77,69 @@ const BetList: React.FC<BetListProps> = ({ bets, onBetUpdated }) => {
   };
 
   return (
-    <Paper elevation={3}>
-      <List>
-        {bets.map((bet) => (
-          <ListItem key={bet.id}>
-            <ListItemText
-              primary={bet.description}
-              secondary={
-                <React.Fragment>
-                  <Typography component="span" variant="body2" color="textPrimary">
-                    Status: {bet.status}
-                  </Typography>
-                  <br />
-                  <Typography component="span" variant="body2" color="textSecondary">
-                    Created by: {bet.creator}
-                  </Typography>
-                  <br />
-                  {bet.counterparty && (
-                    <Typography component="span" variant="body2" color="textSecondary">
-                      Accepted by: {bet.counterparty}
-                    </Typography>
-                  )}
-                  <br />
-                  {bet.creatorProposedOutcome && (
-                    <Typography component="span" variant="body2" color="textSecondary">
-                      Creator's proposed outcome: {bet.creatorProposedOutcome}
-                    </Typography>
-                  )}
-                  {bet.counterpartyProposedOutcome && (
-                    <Typography component="span" variant="body2" color="textSecondary">
-                      Counterparty's proposed outcome: {bet.counterpartyProposedOutcome}
-                    </Typography>
-                  )}
-                  {bet.finalOutcome && (
-                    <Typography component="span" variant="body2" color="textSecondary">
-                      Final outcome: {bet.finalOutcome}
-                    </Typography>
-                  )}
-                  <Typography component="span" variant="body2" color="textSecondary">
-                    Created at: {new Date(Number(bet.createdAt) / 1000000).toLocaleString()}
-                  </Typography>
-                  {bet.smartContractAddress && (
-                    <>
-                      <br />
-                      <Typography component="span" variant="body2" color="textSecondary">
-                        Smart Contract: {bet.smartContractAddress}
-                      </Typography>
-                    </>
-                  )}
-                </React.Fragment>
-              }
-            />
-            {bet.status === 'Proposed' && (
-              <Button variant="contained" color="primary" onClick={() => handleAcceptBet(bet.id)}>
-                Accept Bet
-              </Button>
-            )}
-            {(bet.status === 'Accepted' || bet.status === 'OutcomeProposed') && (
-              <Button variant="contained" color="secondary" onClick={() => handleProposeOutcome(bet)}>
-                Propose Outcome
-              </Button>
-            )}
-            {bet.status === 'OutcomeProposed' && bet.creatorProposedOutcome === bet.counterpartyProposedOutcome && (
-              <Button variant="contained" color="primary" onClick={() => handleAgreeOnOutcome(bet.id)}>
-                Agree on Outcome
-              </Button>
-            )}
-          </ListItem>
-        ))}
-      </List>
+    <List>
+      {bets.map((bet) => (
+        <ListItem key={bet.id}>
+          <Card className="card-hover" sx={{ width: '100%', mb: 2 }}>
+            <CardContent>
+              <Typography variant="h6" component="div" gutterBottom>
+                {bet.description}
+              </Typography>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                <Chip label={bet.status} color="primary" variant="outlined" />
+                <Typography variant="body2" color="text.secondary">
+                  Created: {new Date(Number(bet.createdAt) / 1000000).toLocaleString()}
+                </Typography>
+              </Box>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Creator: {bet.creator}
+              </Typography>
+              {bet.counterparty && (
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  Accepted by: {bet.counterparty}
+                </Typography>
+              )}
+              {bet.creatorProposedOutcome && (
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  Creator's proposed outcome: {bet.creatorProposedOutcome}
+                </Typography>
+              )}
+              {bet.counterpartyProposedOutcome && (
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  Counterparty's proposed outcome: {bet.counterpartyProposedOutcome}
+                </Typography>
+              )}
+              {bet.finalOutcome && (
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  Final outcome: {bet.finalOutcome}
+                </Typography>
+              )}
+              {bet.smartContractAddress && (
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  Smart Contract: {bet.smartContractAddress}
+                </Typography>
+              )}
+              <Box mt={2}>
+                {bet.status === 'Proposed' && (
+                  <Button variant="contained" color="primary" onClick={() => handleAcceptBet(bet.id)}>
+                    Accept Bet
+                  </Button>
+                )}
+                {(bet.status === 'Accepted' || bet.status === 'OutcomeProposed') && (
+                  <Button variant="contained" color="secondary" onClick={() => handleProposeOutcome(bet)}>
+                    Propose Outcome
+                  </Button>
+                )}
+                {bet.status === 'OutcomeProposed' && bet.creatorProposedOutcome === bet.counterpartyProposedOutcome && (
+                  <Button variant="contained" color="primary" onClick={() => handleAgreeOnOutcome(bet.id)}>
+                    Agree on Outcome
+                  </Button>
+                )}
+              </Box>
+            </CardContent>
+          </Card>
+        </ListItem>
+      ))}
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Propose Outcome</DialogTitle>
         <DialogContent>
@@ -166,7 +160,7 @@ const BetList: React.FC<BetListProps> = ({ bets, onBetUpdated }) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Paper>
+    </List>
   );
 };
 

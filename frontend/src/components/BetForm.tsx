@@ -1,6 +1,6 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { TextField, Button, Box, CircularProgress } from '@mui/material';
+import { TextField, Button, Box, CircularProgress, Card, CardContent, Typography } from '@mui/material';
 import { backend } from 'declarations/backend';
 
 interface BetFormProps {
@@ -26,35 +26,42 @@ const BetForm: React.FC<BetFormProps> = ({ onBetCreated }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Box display="flex" flexDirection="column" gap={2}>
-        <Controller
-          name="description"
-          control={control}
-          defaultValue=""
-          rules={{ required: 'Description is required' }}
-          render={({ field, fieldState: { error } }) => (
-            <TextField
-              {...field}
-              label="Bet Description"
-              variant="outlined"
-              fullWidth
-              error={!!error}
-              helperText={error?.message}
+    <Card className="card-hover" sx={{ mb: 4 }}>
+      <CardContent>
+        <Typography variant="h5" component="h2" gutterBottom>
+          Create a New Bet
+        </Typography>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Box display="flex" flexDirection="column" gap={2}>
+            <Controller
+              name="description"
+              control={control}
+              defaultValue=""
+              rules={{ required: 'Description is required' }}
+              render={({ field, fieldState: { error } }) => (
+                <TextField
+                  {...field}
+                  label="Bet Description"
+                  variant="outlined"
+                  fullWidth
+                  error={!!error}
+                  helperText={error?.message}
+                />
+              )}
             />
-          )}
-        />
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          disabled={isSubmitting}
-          startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
-        >
-          Propose Bet
-        </Button>
-      </Box>
-    </form>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={isSubmitting}
+              startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
+            >
+              Propose Bet
+            </Button>
+          </Box>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 
